@@ -103,6 +103,7 @@ resource "aws_db_instance" "db_instance" {
   username             = "admin"
   password             = "password" # TODO cacher mdp
   backup_retention_period = 0
+  skip_final_snapshot = true
   # vpc_security_group_ids = [data.aws_security_group.web-sg-rds.id]
 
   tags = {
