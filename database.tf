@@ -64,25 +64,25 @@ data "aws_availability_zones" "all" {}
 ########################################################################
 # Security Groups
 ## RDS
-# resource "aws_security_group" "web-sg-rds" {
-#   name   = "${var.env}-sg-rds"
-#   vpc_id = data.aws_vpc.selected.id
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-#   ingress {
-#     from_port       = 0
-#     protocol        = "tcp"
-#     to_port         = 3306
-#     cidr_blocks     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ]
-#   }
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+resource "aws_security_group" "web-sg-rds" {
+  name   = "${var.env}-sg-rds"
+  vpc_id = data.aws_vpc.selected.id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port       = 0
+    protocol        = "tcp"
+    to_port         = 3306
+    cidr_blocks     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ]
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 ###############################################
 ## DB INSTANCE
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -104,7 +104,7 @@ resource "aws_db_instance" "db_instance" {
   password             = "password" # TODO cacher mdp
   backup_retention_period = 0
   skip_final_snapshot = true
-  # vpc_security_group_ids = [data.aws_security_group.web-sg-rds.id]
+  vpc_security_group_ids = [data.aws_security_group.web-sg-rds.id]
 
   tags = {
     Name = "dbforsymfony"
