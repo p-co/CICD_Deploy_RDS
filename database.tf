@@ -93,6 +93,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
     Name = "DB subnet group for symfony"
   }
 }
+
 resource "aws_db_instance" "db_instance" {
   allocated_storage    = 20
   storage_type         = "gp2" #basic default
@@ -104,7 +105,7 @@ resource "aws_db_instance" "db_instance" {
   password             = "password" # TODO cacher mdp
   backup_retention_period = 0
   skip_final_snapshot = true
-  vpc_security_group_ids = [data.aws_security_group.web-sg-rds.id]
+  vpc_security_group_ids = [aws_security_group.web-sg-rds.id]
 
   tags = {
     Name = "dbforsymfony"
