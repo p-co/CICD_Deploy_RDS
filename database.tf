@@ -87,7 +87,7 @@ data "aws_availability_zones" "all" {}
 ## DB INSTANCE
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "main"
-  subnet_ids = [data.aws_subnet.subnet-public-1, data.aws_subnet.subnet-public-2, data.aws_subnet.subnet-public-3] # TODO quel subnet mettre 🤔
+  subnet_ids = [data.aws_subnet.subnet-public-1.id, data.aws_subnet.subnet-public-2.id, data.aws_subnet.subnet-public-3.id] # TODO quel subnet mettre 🤔
 
   tags = {
     Name = "DB subnet group for symfony"
