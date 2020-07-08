@@ -55,9 +55,7 @@ data "aws_subnet" "subnet-private-3" {
 }
 
 data "aws_security_group" "web-sg-elb" {
-  tags = {
-    Name = "allow_web"
-  }
+  name = "allow_web"
 }
 
 ## AZ zones de disponibilités dans la région
