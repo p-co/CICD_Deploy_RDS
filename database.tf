@@ -74,7 +74,7 @@ resource "aws_security_group" "web-sg-rds" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    from_port       = 0
+    from_port       = 3306
     protocol        = "tcp"
     to_port         = 3306
     cidr_blocks     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ]
@@ -86,7 +86,7 @@ resource "aws_security_group" "web-sg-rds" {
 ###############################################
 ## DB INSTANCE
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "main"
+  name       = "db-subnet-group"
   subnet_ids = [data.aws_subnet.subnet-public-1.id, data.aws_subnet.subnet-public-2.id, data.aws_subnet.subnet-public-3.id] # TODO quel subnet mettre 🤔
 
   tags = {
@@ -105,6 +105,7 @@ resource "aws_db_instance" "db_instance" {
   password             = "password" # TODO cacher mdp
   backup_retention_period = 0
   skip_final_snapshot = true
+  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.web-sg-rds.id]
 
   tags = {
