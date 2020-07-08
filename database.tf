@@ -83,26 +83,6 @@ resource "aws_security_group" "web-sg-rds" {
     create_before_destroy = true
   }
 }
-## ELB
-resource "aws_security_group" "web-sg-elb" {
-  name   = "${var.env}-sg-elb"
-  vpc_id = data.aws_vpc.selected.id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443
-    protocol    = "tcp"
-    to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]   # Normalement Ouvert sur le web sauf dans le cas d'un site web Privé(Exemple Intranet ou nous qui ne voulons pas exposer le site)
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 ###############################################
 ## DB INSTANCE
 resource "aws_db_subnet_group" "db_subnet_group" {
