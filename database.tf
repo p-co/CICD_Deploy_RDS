@@ -63,6 +63,49 @@ data "aws_availability_zones" "all" {}
 
 ########################################################################
 # Security Groups
+
+## ASG
+resource "aws_security_group" "web-sg-asg" {
+  name   = "${var.env}-sg-asg"
+  vpc_id = data.aws_vpc.selected.id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port       = 443
+    protocol        = "tcp"
+    to_port         = 443
+    security_groups = [aws_security_group.web-sg-elb.id] # on authorise en entrée de l'ASG que le flux venant de l'ELB
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+## retrieve RDS SG and change rule to authorize previous
+## ELB
+resource "aws_security_group" "web-sg-elb" {
+  name   = "${var.env}-sg-elb"
+  vpc_id = data.aws_vpc.selected.id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    protocol    = "tcp"
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]   # Normalement Ouvert sur le web sauf dans le cas d'un site web Privé(Exemple Intranet ou nous qui ne voulons pas exposer le site)
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 ## RDS
 resource "aws_security_group" "web-sg-rds" {
   name   = "${var.env}-sg-rds"
@@ -77,7 +120,7 @@ resource "aws_security_group" "web-sg-rds" {
     from_port       = 3306
     protocol        = "tcp"
     to_port         = 3306
-    cidr_blocks     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ]
+    security_groups = [aws_security_group.web-sg-asg.id]
   }
   lifecycle {
     create_before_destroy = true
@@ -87,7 +130,7 @@ resource "aws_security_group" "web-sg-rds" {
 ## DB INSTANCE
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "db-subnet-group"
-  subnet_ids = [data.aws_subnet.subnet-public-1.id, data.aws_subnet.subnet-public-2.id, data.aws_subnet.subnet-public-3.id] # TODO quel subnet mettre 🤔
+  subnet_ids = [data.aws_subnet.subnet-private-1.id, data.aws_subnet.subnet-private-2.id, data.aws_subnet.subnet-private-3.id] # TODO quel subnet mettre 🤔
 
   tags = {
     Name = "DB subnet group for symfony"
